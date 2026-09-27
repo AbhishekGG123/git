@@ -1,23 +1,29 @@
-FROM node:22-slim
+FROM node:24-trixie
 
-# System utilities aur socat install karein
 RUN apt-get update && apt-get install -y \
+    caddy \
     git \
-    bash \
-    python3 \
-    make \
-    g++ \
-    socat \
+    curl \
+    jq \
+    ripgrep \
+    rsync \
+    zip \
+    less \
     && rm -rf /var/lib/apt/lists/*
 
-# DeepSeek Harness install karein
+RUN corepack enable && corepack prepare pnpm@11.7.0 --activate
+
+RUN mkdir -p /app/workspace
+
+WORKDIR /app
+
 RUN npm install -g @deepseek-ai/dsh
 
-EXPOSE 3080
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY start.sh /start.sh
 
-# Environment setup variables inject karein jo 403 blocks bypass karte hain
-ENV HOST=0.0.0.0
-ENV PORT=3080
+RUN chmod +x /start.sh
 
-# DeepSeek Harness ko --no-open block proxy ke sath start karein
-CMD dsh web --host 127.0.0.1 --port 3081 & sleep 5 && socat TCP-LISTEN:3080,fork,reuseaddr TCP:127.0.0.1:3081
+EXPOSE 8080
+
+CMD ["/start.sh"]
