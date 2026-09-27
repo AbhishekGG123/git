@@ -1,6 +1,6 @@
 FROM node:22-slim
 
-# socat aur system dependencies install karein
+# System utilities aur socat install karein
 RUN apt-get update && apt-get install -y \
     git \
     bash \
@@ -15,5 +15,9 @@ RUN npm install -g @deepseek-ai/dsh
 
 EXPOSE 3080
 
-# Background me traffic internally reroute karne ke liye entrypoint script chalayein
-CMD socat TCP-LISTEN:3080,fork,reuseaddr TCP:127.0.0.1:3081 & dsh web --host 127.0.0.1 --port 3081
+# Environment setup variables inject karein jo 403 blocks bypass karte hain
+ENV HOST=0.0.0.0
+ENV PORT=3080
+
+# DeepSeek Harness ko --no-open block proxy ke sath start karein
+CMD dsh web --host 127.0.0.1 --port 3081 & sleep 5 && socat TCP-LISTEN:3080,fork,reuseaddr TCP:127.0.0.1:3081
