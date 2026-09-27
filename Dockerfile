@@ -1,17 +1,12 @@
-# Use a base image that supports systemd, for example, Ubuntu
-FROM ubuntu:20.04
+FROM node:22-alpine
 
-# Install necessary packages
-RUN apt-get update && \
-    apt-get install -y shellinabox && \
-    apt-get install -y systemd && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN echo 'root:root' | chpasswd
-# Expose the web-based terminal port
-EXPOSE 4200
+# System tools install karein jo harness ko chahiye
+RUN apk add --no-cache git bash python3 make g++
 
-# Start shellinabox
-CMD ["/usr/bin/shellinaboxd", "-t", "-s", "/:LOGIN"]
+# DeepSeek Harness ko globally install karein
+RUN npm install -g @deepseek-ai/dsh
 
+EXPOSE 3080
 
+# Local proxy bypass ke saath harness ko start karein
+CMD ["dsh", "web", "--host", "0.0.0.0", "--port", "3080"]
