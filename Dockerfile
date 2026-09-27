@@ -1,6 +1,6 @@
 FROM node:22-slim
 
-# System tools install karein jo native modules build karne me kaam aate hain
+# System tools install karein
 RUN apt-get update && apt-get install -y \
     git \
     bash \
@@ -14,5 +14,5 @@ RUN npm install -g @deepseek-ai/dsh
 
 EXPOSE 3080
 
-# Production layer settings ke sath run karein
-CMD ["dsh", "web", "--host", "0.0.0.0", "--port", "3080"]
+# Isko safely local loopback interface par bind karein
+CMD ["dsh", "web", "--host", "127.0.0.1", "--port", "3080"]
